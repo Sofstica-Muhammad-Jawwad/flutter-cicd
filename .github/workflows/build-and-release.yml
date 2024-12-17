@@ -65,7 +65,7 @@ jobs:
             echo git push origin --delete $BRANCH_NAME
 
             echo Set the upstream branch for the renamed branch
-            echo git push --set-upstream origin "${{ env.new_branch_name }}"
+            echo git push --set-upstream origin "$NEW_BRANCH_NAME"
 
             echo Checkout the target branch (main) for merging
             git fetch origin
