@@ -47,16 +47,15 @@ jobs:
             NEW_BRANCH_NAME="${BRANCH_NAME/$REMOVE_STRING/}"
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
-            echo "$NEW_BRANCH_NAME"
             echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
             
-            "New branch name: $NEW_BRANCH_NAME"
+            echo "New branch name: $NEW_BRANCH_NAME"
 
             echo Fetch all branches to ensure we're working with the latest information
             git fetch --all
 
             echo Create a new branch from the current branch
-             git checkout -b "$NEW_BRANCH_NAME"
+            git checkout -b "$NEW_BRANCH_NAME"
 
             echo Push the new branch to the remote repository
             git push origin "$NEW_BRANCH_NAME"
