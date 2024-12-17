@@ -47,7 +47,7 @@ jobs:
             NEW_BRANCH_NAME="${BRANCH_NAME/$REMOVE_STRING/}"
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
-            "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
+            echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
             
             echo "New branch name: {{ env.new_branch_name }}"
 
