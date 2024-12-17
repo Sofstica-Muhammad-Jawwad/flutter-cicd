@@ -32,49 +32,21 @@ jobs:
              fi
           fi
 
-      - name: Print a beautiful line  android release(Release Branch)
+      - name: Create a branch in GitHub
         if: ${{ env.is_release_android_upload == 'true' }}  # Only run for release branches
         run: |
-          echo "🎉🎉🎉 ANDROID RELEASE BRANCH  🎉🎉🎉"
-
-          # Extract the current branch name from $GITHUB_REF
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          
-          # Define the string to remove from the branch name
-          REMOVE_STRING="-android"
-
-          if [[ "$BRANCH_NAME" == *"$REMOVE_STRING"* ]]; then
-            NEW_BRANCH_NAME="${BRANCH_NAME/$REMOVE_STRING/}"
-            echo "Branch name before: $BRANCH_NAME"
-            echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
-            echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
-            
-            echo "New branch name: $new_branch_name"
-
-            echo Fetch all branches to ensure we're working with the latest information
-            git fetch --all
-
-            echo Create a new branch from the current branch
-            echo "new_branch_name=release/1.0.0" >> $GITHUB_ENV  # Set new branch name in environment variable
-            git checkout -b "$new_branch_name"
-
-            echo Push the new branch to the remote repository
-            git push origin "$new_branch_name"
-
-            echo Delete the old branch from remote
-            git push origin --delete "$BRANCH_NAME"
-
-            echo Set the upstream branch for the renamed branch
-            git push --set-upstream origin "$new_branch_name"
-
-            echo Checkout the target branch (main) for merging
-            git fetch origin
-            git checkout main  # Or replace with your target branch name
-            git pull origin main  # Ensure it's up-to-date with the remote
-
-            echo Merge the "$new_branch_name" renamed branch into the target branch
-            git merge "$new_branch_name" --no-ff -m "Merge ${{ new_branch_name }} into main"
-            git push origin main  # Push the changes to the target branch
-          fi
+            # Checkout to the branch from which you want to create a new branch (usually 'main' or 'master')
+            git checkout main
+    
+            # Fetch latest changes
+            git pull origin main
+    
+            # Create a new branch (you can replace 'new-branch-name' with the desired branch name)
+            NEW_BRANCH="new-branch-name"
+            git checkout -b $NEW_BRANCH
+    
+            # Push the new branch to GitHub
+            git push origin $NEW_BRANCH
+      
    
  
