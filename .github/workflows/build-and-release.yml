@@ -34,13 +34,7 @@ jobs:
 
       - name: Create a branch in GitHub
         if: ${{ env.is_release_android_upload == 'true' }}  # Only run for release branches
-        run: |
-            # Checkout to the branch from which you want to create a new branch (usually 'main' or 'master')
-            git checkout main
-    
-            # Fetch latest changes
-            git pull origin main
-    
+        run: |    
             # Create a new branch (you can replace 'new-branch-name' with the desired branch name)
             NEW_BRANCH="new-branch-name"
             git checkout -b $NEW_BRANCH
