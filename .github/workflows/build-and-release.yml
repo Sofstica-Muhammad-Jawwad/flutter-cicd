@@ -69,7 +69,7 @@ jobs:
             git checkout main  # Or replace with your target branch name
             git pull origin main  # Ensure it's up-to-date with the remote
 
-            echo Merge the renamed branch into the target branch
+            echo Merge the "${{ env.new_branch_name }}" renamed branch into the target branch
             git merge "${{ env.new_branch_name }}" --no-ff -m "Merge "${{ env.new_branch_name }}" into main"
             git push origin main  # Push the changes to the target branch
           fi
