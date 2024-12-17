@@ -17,11 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-       - name: Set Git user
+      - name: Set Git user
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
+
       - name: If branch dont starts with 'release/'
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
