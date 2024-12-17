@@ -4,7 +4,11 @@ on:
   create:
     branches:
       - 'release/*'  # Trigger only for branches starting with 'release/'
+permissions:
+  contents: write  # Allow push to the repository
+  actions: read    # Allow reading action logs (optional)
 
+  
 jobs:
   print-message:
     runs-on: ubuntu-latest
