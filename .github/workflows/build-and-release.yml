@@ -13,18 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Ensure branch starts with 'release/'
+      - name: If branch dont starts with 'release/'
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           if [[ ! "$BRANCH_NAME" =~ ^release/ ]]; then
             echo "This is not a release branch, exiting..."
             exit 0
+          else
+             echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
+             echo "--------------------------------------------"
+             echo "          Release Branch Detected         "
+             echo "          ----------------------         "
+             echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
           fi
 
-      - name: Print a beautiful line
-        run: |
-          echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
-          echo "--------------------------------------------"
-          echo "          Release Branch Detected         "
-          echo "          ----------------------         "
-          echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
+ 
