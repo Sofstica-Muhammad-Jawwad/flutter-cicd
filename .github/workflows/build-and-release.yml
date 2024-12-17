@@ -18,6 +18,7 @@ jobs:
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           if [[ ! "$BRANCH_NAME" =~ ^release/ ]]; then
             echo "This is not a release branch, exiting..."
+             echo "is_release_android_upload=false" >> $GITHUB_ENV  # Set environment variable to false
             exit 0
           else
              echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
@@ -25,6 +26,22 @@ jobs:
              echo "          Release Branch Detected         "
              echo "          ----------------------         "
              echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
+             if [[ "$BRANCH_NAME" == *"android"* ]]; then
+             echo "The branch contains 'android', running the new job."
+             echo "is_release_android_upload=true" >> $GITHUB_ENV  # Set environment variable to false
+             else
+             echo "The branch does not contain 'android'."
+             echo "is_android_branch=false" >> $GITHUB_ENV  # Set environment variable to false
+             fi
           fi
+
+      - name: Print a beautiful line (Release Branch)
+        if: ${{ env.is_release_branch == 'true' }}  # Only run for release branches
+        run: |
+          echo "🎉🎉🎉 THIS BRANCH UPLOAD  🎉🎉🎉"
+          echo "--------------------------------------------"
+          echo "          Release Branch Detected         "
+          echo "          ----------------------         "
+          echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
 
  
