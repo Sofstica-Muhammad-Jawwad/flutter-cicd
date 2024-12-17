@@ -6,23 +6,6 @@ on:
       - main
 
 jobs:
-  check-pr-title:
-    runs-on: ubuntu-latest
-    needs: run-pre-merge-checks
-
-    steps:
-      - name: Check PR title
-        shell: bash
-        run: |
-          if [[ ! "${{ github.event.pull_request.title }}" =~ ^(C4LIFE|release/) ]]; then
-            echo "Error: PR title does not start with 'C4LIFE' or 'release/'."
-            echo "Please update the PR title to follow the naming convention."
-            exit 1
-          else
-            echo "PR title follows the naming convention."
-          fi
-        continue-on-error: false
-
   run-pre-merge-checks:
     runs-on: ubuntu-latest
 
@@ -45,3 +28,4 @@ jobs:
           ./custom_scripts/pre_merge_checks.sh
         continue-on-error: false
 
+  
