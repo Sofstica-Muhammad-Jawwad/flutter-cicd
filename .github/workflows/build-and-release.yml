@@ -55,16 +55,16 @@ jobs:
             git fetch --all
 
             echo Create a new branch from the current branch
-            git checkout -b "{{ env.new_branch_name }}"
+            git checkout -b "${{ env.new_branch_name }}"
 
             echo Push the new branch to the remote repository
-            git push origin "{{ env.new_branch_name }}"
+            git push origin "${{ env.new_branch_name }}"
 
             echo Delete the old branch from remote
             git push origin --delete $BRANCH_NAME
 
             echo Set the upstream branch for the renamed branch
-            git push --set-upstream origin "{{ env.new_branch_name }}"
+            git push --set-upstream origin "${{ env.new_branch_name }}"
 
             echo Checkout the target branch (main) for merging
             git fetch origin
@@ -72,8 +72,8 @@ jobs:
             git pull origin main  # Ensure it's up-to-date with the remote
 
             echo Merge the "${{ env.new_branch_name }}" renamed branch into the target branch
-            echo  git merge "{{ env.new_branch_name }}" --no-ff -m "Merge "${{ env.new_branch_name }}" into main"
-            echo git push origin main  # Push the changes to the target branch
+            git merge "{{ env.new_branch_name }}" --no-ff -m "Merge "${{ env.new_branch_name }}" into main"
+            git push origin main  # Push the changes to the target branch
           fi
    
  
