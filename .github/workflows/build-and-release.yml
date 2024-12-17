@@ -65,7 +65,7 @@ jobs:
             echo Set the upstream branch for the renamed branch
             git push --set-upstream origin $NEW_BRANCH_NAME
 
-            echo Checkout the target branch (main) for merging
+            echo Checkout the target branch main for merging
             git fetch origin
             git checkout main  # Or replace with your target branch name
             git pull origin main  # Ensure it's up-to-date with the remote
