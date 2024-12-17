@@ -3,7 +3,7 @@ name: Build And Release
 on:
   create:
     branches:
-      - 'release/*'  # Trigger for any branch starting with 'release/'
+      - 'release/*'  # Trigger only for branches starting with 'release/'
 
 jobs:
   print-message:
@@ -12,6 +12,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Ensure branch starts with 'release/'
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          if [[ ! "$BRANCH_NAME" =~ ^release/ ]]; then
+            echo "This is not a release branch, exiting..."
+            exit 0
+          fi
 
       - name: Print a beautiful line
         run: |
