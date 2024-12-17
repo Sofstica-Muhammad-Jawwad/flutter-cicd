@@ -22,11 +22,8 @@ jobs:
             exit 0
           else
              echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
-             echo "--------------------------------------------"
-             echo "          Release Branch Detected         "
-             echo "          ----------------------         "
-             echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
-             if [[ "$BRANCH_NAME" == *"android"* ]]; then
+        
+             if [[ "$BRANCH_NAME" == *"-android"* ]]; then
              echo "The branch contains 'android', running the new job."
              echo "is_release_android_upload=true" >> $GITHUB_ENV  # Set environment variable to false
              else
@@ -35,13 +32,46 @@ jobs:
              fi
           fi
 
-      - name: Print a beautiful line (Release Branch)
+      - name: Print a beautiful line  android release(Release Branch)
         if: ${{ env.is_release_android_upload == 'true' }}  # Only run for release branches
         run: |
-          echo "🎉🎉🎉 THIS BRANCH UPLOAD  🎉🎉🎉"
-          echo "--------------------------------------------"
-          echo "          Release Branch Detected         "
-          echo "          ----------------------         "
-          echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
+          echo "🎉🎉🎉 ANDROID RELEASE BRANCH  🎉🎉🎉"
 
+          # Extract the current branch name from $GITHUB_REF
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          
+          # Define the string to remove from the branch name
+          REMOVE_STRING="-android"
+
+          if [[ "$BRANCH_NAME" == *"$REMOVE_STRING"* ]]; then
+            NEW_BRANCH_NAME="${BRANCH_NAME/$REMOVE_STRING/}"
+            echo "Branch name before: $BRANCH_NAME"
+            echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
+            echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
+            
+            # Fetch all branches to ensure we're working with the latest information
+            git fetch --all
+
+            # Create a new branch from the current branch
+            git checkout -b "${{ env.new_branch_name }}"
+
+            # Push the new branch to the remote repository
+            git push origin "${{ env.new_branch_name }}"
+
+            # Delete the old branch from remote
+            git push origin --delete $BRANCH_NAME
+
+            # Set the upstream branch for the renamed branch
+            git push --set-upstream origin "${{ env.new_branch_name }}"
+
+            #Checkout the target branch (main) for merging
+            git fetch origin
+            git checkout main  # Or replace with your target branch name
+            git pull origin main  # Ensure it's up-to-date with the remote
+
+            # Merge the renamed branch into the target branch
+            git merge "${{ env.new_branch_name }}" --no-ff -m "Merge "${{ env.new_branch_name }}" into main"
+            git push origin main  # Push the changes to the target branch
+          fi
+   
  
