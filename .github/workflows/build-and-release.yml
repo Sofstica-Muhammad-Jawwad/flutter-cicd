@@ -28,7 +28,7 @@ jobs:
              echo "is_release_android_upload=true" >> $GITHUB_ENV  # Set environment variable to false
              else
              echo "The branch does not contain 'android'."
-             echo "is_android_branch=false" >> $GITHUB_ENV  # Set environment variable to false
+             echo "is_release_android_upload=false" >> $GITHUB_ENV  # Set environment variable to false
              fi
           fi
 
@@ -49,31 +49,31 @@ jobs:
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
             echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
             
-            echo "New branch name: ${{ env.new_branch_name }}"
+            echo "New branch name: $env.new_branch_name"
 
             echo Fetch all branches to ensure we're working with the latest information
             git fetch --all
 
             echo Create a new branch from the current branch
             echo "new_branch_name=release/1.0.0" >> $GITHUB_ENV  # Set new branch name in environment variable
-            git checkout -b ${{ env.new_branch_name }}
+            git checkout -b "$env.new_branch_name"
 
             echo Push the new branch to the remote repository
-            git push origin ${{ env.new_branch_name }}
+            git push origin "$env.new_branch_name"
 
             echo Delete the old branch from remote
             git push origin --delete "$BRANCH_NAME"
 
             echo Set the upstream branch for the renamed branch
-            git push --set-upstream origin ${{ env.new_branch_name }}
+            git push --set-upstream origin "$env.new_branch_name"
 
             echo Checkout the target branch (main) for merging
             git fetch origin
             git checkout main  # Or replace with your target branch name
             git pull origin main  # Ensure it's up-to-date with the remote
 
-            echo Merge the ${{ env.new_branch_name }} renamed branch into the target branch
-            git merge ${{ env.new_branch_name }} --no-ff -m "Merge ${{ env.new_branch_name }} into main"
+            echo Merge the "$env.new_branch_name" renamed branch into the target branch
+            git merge "$env.new_branch_name" --no-ff -m "Merge ${{ env.new_branch_name }} into main"
             git push origin main  # Push the changes to the target branch
           fi
    
