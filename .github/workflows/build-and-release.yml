@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Print a beautiful line (Release Branch)
-        if: ${{ env.is_release_branch == 'true' }}  # Only run for release branches
+        if: ${{ env.is_release_android_upload == 'true' }}  # Only run for release branches
         run: |
           echo "🎉🎉🎉 THIS BRANCH UPLOAD  🎉🎉🎉"
           echo "--------------------------------------------"
