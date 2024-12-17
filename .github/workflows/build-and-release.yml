@@ -61,7 +61,7 @@ jobs:
             git push origin ${{ env.new_branch_name }}
 
             echo Delete the old branch from remote
-            git push origin --delete $BRANCH_NAME
+            git push origin --delete "$BRANCH_NAME"
 
             echo Set the upstream branch for the renamed branch
             git push --set-upstream origin ${{ env.new_branch_name }}
