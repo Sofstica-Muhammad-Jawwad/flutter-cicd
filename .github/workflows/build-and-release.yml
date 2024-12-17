@@ -52,7 +52,6 @@ jobs:
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
        
-            # echo Fetch all branches to ensure we're working with the latest information
             git fetch --all
             echo Create a new branch from the current branch
             git checkout -b $NEW_BRANCH_NAME
