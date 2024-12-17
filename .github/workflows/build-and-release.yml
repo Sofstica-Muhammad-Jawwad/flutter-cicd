@@ -49,8 +49,8 @@ jobs:
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
             echo "new_branch_name=$NEW_BRANCH_NAME" >> $GITHUB_ENV  # Set new branch name in environment variable
             
-            echo "New branch name: ${{ env.new_branch_name }}"
-            
+            echo "New branch name: $NEW_BRANCH_NAME"
+
             echo Fetch all branches to ensure we're working with the latest information
             git fetch --all
 
