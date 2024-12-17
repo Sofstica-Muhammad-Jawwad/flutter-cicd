@@ -55,6 +55,7 @@ jobs:
             git fetch --all
 
             echo Create a new branch from the current branch
+            echo "new_branch_name=release/1.0.0" >> $GITHUB_ENV  # Set new branch name in environment variable
             git checkout -b ${{ env.new_branch_name }}
 
             echo Push the new branch to the remote repository
