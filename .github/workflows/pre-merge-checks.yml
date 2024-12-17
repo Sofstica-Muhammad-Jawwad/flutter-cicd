@@ -1,13 +1,35 @@
-name: Pre-Merge Checks
+name: Branch Create and Pre-Merge Checks
 
 on:
+  create:
+    branches:
+      - 'release/*'  # Trigger for any branch starting with 'release/'
   pull_request:
     branches:
-      - main
+      - main  # Trigger for pull requests targeting the 'main' branch
 
 jobs:
+  # Job for handling branch creation and printing the message
+  print-release-message:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'create'  # Only run this job when a branch is created
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Print a beautiful line
+        run: |
+          echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
+          echo "--------------------------------------------"
+          echo "          Release Branch Detected         "
+          echo "          ----------------------         "
+          echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
+
+  # Job for running pre-merge checks when creating a pull request
   run-pre-merge-checks:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'  # Only run this job when a PR is created
 
     steps:
       - name: Checkout code
@@ -27,5 +49,3 @@ jobs:
           chmod +x ./custom_scripts/pre_merge_checks.sh
           ./custom_scripts/pre_merge_checks.sh
         continue-on-error: false
-
-  
