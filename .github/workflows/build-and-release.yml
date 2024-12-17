@@ -1,0 +1,22 @@
+name: Build And Release
+
+on:
+  create:
+    branches:
+      - 'release/*'  # Trigger for any branch starting with 'release/'
+
+jobs:
+  print-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Print a beautiful line
+        run: |
+          echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
+          echo "--------------------------------------------"
+          echo "          Release Branch Detected         "
+          echo "          ----------------------         "
+          echo "🎉🎉🎉 Congratulations on your new release branch! 🎉🎉🎉"
