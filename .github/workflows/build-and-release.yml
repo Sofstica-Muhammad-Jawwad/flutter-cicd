@@ -81,6 +81,7 @@ jobs:
           fi
 
       - name: Merge release/X.X.X -> main
+        if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
         with:
           type: now
