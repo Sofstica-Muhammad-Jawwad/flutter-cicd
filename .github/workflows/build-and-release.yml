@@ -87,7 +87,7 @@ jobs:
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.1'  # Update to a version that is compatible with Dart SDK >= 3.2.2
+          flutter-version: '3.16.2'  # Update to a version that is compatible with Dart SDK >= 3.2.2
 
       - name: Build APK
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
