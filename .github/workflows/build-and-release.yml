@@ -16,12 +16,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
- 
+
       - name: Set Git user
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
- 
+
       - name: If branch doesn't start with 'release/'
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
@@ -40,42 +40,46 @@ jobs:
               echo "is_android_branch=false" >> $GITHUB_ENV  # Set environment variable to false
             fi
           fi
- 
-      - name: Print a beautiful line for android release (Release Branch)
+
+      - name: Process Android release (Release Branch)
         if: ${{ env.is_release_android_upload == 'true' }}  # Only run for release branches
         run: |
           echo "🎉🎉🎉 ANDROID RELEASE BRANCH  🎉🎉🎉"
- 
+
           # Extract the current branch name from $GITHUB_REF
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           
           # Define the string to remove from the branch name
           REMOVE_STRING="-android"
- 
+
           if [[ "$BRANCH_NAME" == *"$REMOVE_STRING"* ]]; then
             NEW_BRANCH_NAME="${BRANCH_NAME/$REMOVE_STRING/}"
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
-       
+
+            # Set the new branch name in the environment
+            echo "NEW_BRANCH_NAME=$NEW_BRANCH_NAME" >> $GITHUB_ENV
+
+            # Fetch all branches
             git fetch --all
-            echo Create a new branch from the current branch
+            echo "Create a new branch from the current branch"
             git checkout -b $NEW_BRANCH_NAME
- 
-            echo Push the new branch to the remote repository
+
+            echo "Push the new branch to the remote repository"
             git push origin $BRANCH_NAME
             git push origin $NEW_BRANCH_NAME
- 
-            echo Delete the old branch from remote
+
+            echo "Delete the old branch from remote"
             git push origin --delete $BRANCH_NAME
- 
-            echo Set the upstream branch for the renamed branch
+
+            echo "Set the upstream branch for the renamed branch"
             git push --set-upstream origin $NEW_BRANCH_NAME
           fi
 
-      - name: Merge release/X.X.X -> staging
+      - name: Merge release/X.X.X -> main
         uses: devmasx/merge-branch@master
         with:
           type: now
-          from_branch: $NEW_BRANCH_NAME
+          from_branch: ${{ env.NEW_BRANCH_NAME }}  # Use the new branch name from the environment
           target_branch: main
           github_token: ${{ secrets.GITHUB_TOKEN }}
