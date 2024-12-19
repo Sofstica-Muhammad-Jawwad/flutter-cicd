@@ -80,6 +80,9 @@ jobs:
             echo "Merging $NEW_BRANCH_NAME into main, overriding conflicts..."
             git merge $NEW_BRANCH_NAME --no-ff --allow-unrelated-histories -X theirs
 
+            # After merging, ensure deleted files and folders are staged for removal
+            git ls-files --deleted | xargs git rm -f  # Remove any deleted files/folders from the staging area
+
             # Push the changes to the main branch
             git push origin main  # Push the changes to the target branch
           fi
