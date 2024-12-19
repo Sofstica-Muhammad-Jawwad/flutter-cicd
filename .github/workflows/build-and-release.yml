@@ -140,10 +140,7 @@ jobs:
               });
 
               let release;
-              if (releases.data.length > 0) {
-                // If releases exist, take the latest release
-                release = releases.data[0];
-              } else {
+   
                 // If no releases exist, create a new one
                 release = await github.repos.createRelease({
                   owner: context.repo.owner,
@@ -154,7 +151,6 @@ jobs:
                   draft: false,
                   prerelease: false
                 });
-              }
 
               // Upload the APK to the release
               const uploadUrl = release.upload_url;
