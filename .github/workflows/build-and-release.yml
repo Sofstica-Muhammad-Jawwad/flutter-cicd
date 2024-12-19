@@ -127,7 +127,7 @@ jobs:
             const fileSize = fs.statSync(artifactPath).size;
 
             // Extract the version number from the branch name (e.g., "release/1.0.0")
-            const branchName = process.env.GITHUB_REF.split('/').pop();
+            const branchName = process.env.GITHUB_REF.split('/').pop().split('-')[0];
             const versionTag = `v${branchName}`;
 
             const artifactName = `app-release-${versionTag}.apk`;
@@ -153,7 +153,7 @@ jobs:
                 });
 
               // Upload the APK to the release
-              const uploadUrl = release.upload_url;
+              const uploadUrl = release.upload_url.replace("{?name,label}", "");
 
               await github.repos.uploadReleaseAsset({
                 owner: context.repo.owner,
