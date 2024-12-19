@@ -10,7 +10,7 @@ permissions:
   actions: read    # Allow reading action logs (optional)
  
 jobs:
-  print-message:
+  build-and-releases:
     runs-on: ubuntu-latest
  
     steps:
@@ -70,16 +70,12 @@ jobs:
  
             echo Set the upstream branch for the renamed branch
             git push --set-upstream origin $NEW_BRANCH_NAME
- 
-            # Checkout the target branch main for merging
-            git fetch origin
-            git checkout main  # Or replace with your target branch name
-            git pull origin main  # Ensure it's up-to-date with the remote
- 
-            # Merge the $NEW_BRANCH_NAME renamed branch into the target branch (main)
-            echo "Merging $NEW_BRANCH_NAME into main, overriding conflicts..."
-            git merge $NEW_BRANCH_NAME --no-ff --allow-unrelated-histories -X theirs
- 
-            # Push the changes to the main branch
-            git push origin main  # Push the changes to the target branch
           fi
+
+      - name: Merge release/X.X.X -> staging
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: $NEW_BRANCH_NAME
+          target_branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
