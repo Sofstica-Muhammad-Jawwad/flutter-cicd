@@ -77,7 +77,7 @@ jobs:
             git pull origin main  # Ensure it's up-to-date with the remote
 
             echo Merge the $NEW_BRANCH_NAME renamed branch into the target branch
-            git merge $NEW_BRANCH_NAME --no-ff --allow-unrelated-histories -m
+            git merge $NEW_BRANCH_NAME --no-ff --allow-unrelated-histories
             git push origin main  # Push the changes to the target branch
           fi
    
