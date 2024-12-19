@@ -1,5 +1,5 @@
 name: Build And Release
- 
+
 on:
   create:
     branches:
@@ -7,15 +7,15 @@ on:
 
 env:
   KEY_JKS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
- 
+
 permissions:
   contents: write  # Allow push to the repository
   actions: read    # Allow reading action logs (optional)
- 
+
 jobs:
   build-and-releases:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,32 +31,26 @@ jobs:
           if [[ ! "$BRANCH_NAME" =~ ^release/ ]]; then
             echo "This is not a release branch, exiting..."
             echo "is_release_android_upload=false" >> $GITHUB_ENV  # Set environment variable to false
-            echo "is_rename_branch=false" >> $GITHUB_ENV 
+            echo "is_rename_branch=false" >> $GITHUB_ENV
             exit 0
           else
             echo "🎉🎉🎉 New release branch created: $GITHUB_REF 🎉🎉🎉"
-        
             if [[ "$BRANCH_NAME" == *"-android"* ]]; then
               echo "The branch contains 'android', running the new job."
               echo "is_release_android_upload=true" >> $GITHUB_ENV  # Set environment variable to true
-              echo "is_rename_branch=true" >> $GITHUB_ENV 
-
+              echo "is_rename_branch=true" >> $GITHUB_ENV
             else
               echo "The branch does not contain 'android'."
               echo "is_android_branch=false" >> $GITHUB_ENV  # Set environment variable to false
-              echo "is_rename_branch=false" >> $GITHUB_ENV 
+              echo "is_rename_branch=false" >> $GITHUB_ENV
             fi
           fi
 
       - name: Rename release/X.X.X-release-type to release/X.X.X
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: |
-          echo "🎉🎉🎉 ANDROID RELEASE BRANCH  🎉🎉🎉"
-
-          # Extract the current branch name from $GITHUB_REF
+          echo "🎉🎉🎉 ANDROID RELEASE BRANCH 🎉🎉🎉"
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          
-          # Define the string to remove from the branch name
           REMOVE_STRING="-android"
 
           if [[ "$BRANCH_NAME" == *"$REMOVE_STRING"* ]]; then
@@ -64,10 +58,9 @@ jobs:
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
 
-            # Set the new branch name in the environment
             echo "NEW_BRANCH_NAME=$NEW_BRANCH_NAME" >> $GITHUB_ENV
 
-            # Fetch all branches
+            # Fetch all branches and create a new branch
             git fetch --all
             echo "Create a new branch from the current branch"
             git checkout -b $NEW_BRANCH_NAME
@@ -118,10 +111,9 @@ jobs:
         id: attach_asset
         uses: actions/github-script@v4
         with:
-          github-token: ${{ secrets.ACTION_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Ensure you are using the correct GitHub token
           script: |
             const fs = require('fs');
-            
             const artifactPath = process.env.GITHUB_WORKSPACE + '/build/app/outputs/flutter-apk/app-release.apk';
             const fileSize = fs.statSync(artifactPath).size;
             const artifactName = 'app-release.apk';
@@ -138,7 +130,7 @@ jobs:
               },
             });
             console.log(`Uploaded ${artifactName} to release ID ${releaseId}`);
-      
+
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
