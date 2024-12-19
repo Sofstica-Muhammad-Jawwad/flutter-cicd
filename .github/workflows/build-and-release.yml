@@ -139,14 +139,14 @@ jobs:
               });
 
               let release;
-   
+     
               // If no releases exist, create a new one
               release = await github.repos.createRelease({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                tag_name: `${versionTag}`,  # Set your desired release tag here
-                name: `${versionTag}`,  # Name of the release
-                body: `This is the release for version ${versionTag}.`,
+                tag_name: `${versionTag}`,  // Set your desired release tag here
+                name: `${versionTag}`,  // Name of the release
+                body: `This is the release for version ${versionTag}.`, // Body of the release
                 draft: false,
                 prerelease: false
               });
