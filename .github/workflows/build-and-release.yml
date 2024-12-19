@@ -117,11 +117,23 @@ jobs:
             const artifactPath = process.env.GITHUB_WORKSPACE + '/build/app/outputs/flutter-apk/app-release.apk';
             const fileSize = fs.statSync(artifactPath).size;
             const artifactName = 'app-release.apk';
-            const releaseId = ${{ steps.get_latest_release.outputs.latest_release_id }};
-            const uploadUrl = await github.repos.uploadReleaseAsset({
+
+            // Get latest release ID using GitHub context
+            const latestReleaseId = '${{ steps.get_latest_release.outputs.latest_release_id }}';
+
+            const release = await github.repos.getRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              release_id: releaseId,
+              release_id: latestReleaseId
+            });
+
+            const uploadUrl = release.data.upload_url;
+
+            // Upload the APK to the release
+            await github.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: latestReleaseId,
               name: artifactName,
               data: fs.readFileSync(artifactPath),
               headers: {
@@ -129,7 +141,8 @@ jobs:
                 'content-type': 'application/octet-stream',
               },
             });
-            console.log(`Uploaded ${artifactName} to release ID ${releaseId}`);
+
+            console.log(`Uploaded ${artifactName} to release ID ${latestReleaseId}`);
 
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
