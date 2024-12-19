@@ -122,32 +122,51 @@ jobs:
             const fileSize = fs.statSync(artifactPath).size;
             const artifactName = 'app-release.apk';
 
-            // Get latest release ID using GitHub context
-            const latestReleaseId = '${{ steps.get_latest_release.outputs.latest_release_id }}';
+            // Check if there are any releases
+            try {
+              const releases = await github.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
 
-            const release = await github.repos.getRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: latestReleaseId
-            });
+              let release;
+              if (releases.data.length > 0) {
+                // If releases exist, take the latest release
+                release = releases.data[0];
+              } else {
+                // If no releases exist, create a new one
+                release = await github.repos.createRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag_name: 'v1.0.0',  // Set your desired release tag here
+                  name: 'Initial Release',  // Name of the release
+                  body: 'This is the initial release of the app.',
+                  draft: false,
+                  prerelease: false
+                });
+              }
 
-            const uploadUrl = release.data.upload_url;
+              // Upload the APK to the release
+              const uploadUrl = release.upload_url;
 
-            // Upload the APK to the release
-            await github.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: latestReleaseId,
-              name: artifactName,
-              data: fs.readFileSync(artifactPath),
-              headers: {
-                'content-length': fileSize,
-                'content-type': 'application/octet-stream',
-              },
-            });
+              await github.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                name: artifactName,
+                data: fs.readFileSync(artifactPath),
+                headers: {
+                  'content-length': fileSize,
+                  'content-type': 'application/octet-stream',
+                },
+              });
 
-            console.log(`Uploaded ${artifactName} to release ID ${latestReleaseId}`);
+              console.log(`Uploaded ${artifactName} to release ID ${release.id}`);
 
+            } catch (error) {
+              console.error('Error uploading release asset:', error);
+              throw error;
+            }
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
