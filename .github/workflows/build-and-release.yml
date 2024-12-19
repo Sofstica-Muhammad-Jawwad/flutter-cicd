@@ -4,6 +4,9 @@ on:
   create:
     branches:
       - 'release/*'  # Trigger only for branches starting with 'release/'
+
+env:
+  KEY_JKS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
  
 permissions:
   contents: write  # Allow push to the repository
@@ -80,42 +83,62 @@ jobs:
             git push --set-upstream origin $NEW_BRANCH_NAME
           fi
 
-      - name: Build APK for Android
-        if: ${{ env.is_rename_branch == 'true' }}  # Only run for Android release branches
-        run: |
-          echo "🎉🎉🎉 Building APK 🎉🎉🎉"
-          # Install Flutter SDK if not already installed
-          git clone https://github.com/flutter/flutter.git --branch stable --single-branch --depth 1
-          export PATH="$PATH:`pwd`/flutter/bin"
-          
-          # Ensure Flutter is installed
-          flutter doctor -v
+      - name: Set up JDK 17
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
 
-          # Get dependencies
-          flutter pub get
+      - name: Set up Flutter
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
 
-          # Build the APK (replace with the appropriate flavor if necessary)
-          flutter build apk --release
+      - name: Upload APK
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        id: upload_asset
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
 
-          # Save the APK as an artifact for future steps
-          mv build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/app-release.apk
+      - name: Set up Node.js
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-      - name: Create GitHub Release and Attach APK
-        if: ${{ env.is_rename_branch == 'true' }}  # Only run for Android release branches
-        run: |
-          echo "🎉🎉🎉 Creating GitHub Release 🎉🎉🎉"
+      - name: Install dependencies
+        run: npm install @actions/github
 
-          # Get version name from the branch
-          VERSION_NAME=${GITHUB_REF#refs/heads/release/}
-          TAG_NAME="v$VERSION_NAME"  # Tag name should be like vX.X.X
-
-          # Create a release using GitHub CLI
-          gh release create $TAG_NAME $GITHUB_WORKSPACE/app-release.apk \
-            --title "Release $VERSION_NAME" \
-            --notes "### Changelog\n\n- Added new features.\n- Fixed bugs.\n\nRelease for version $VERSION_NAME" \
-            --target main  # Make sure to specify the target branch for the release
-
-
+      - name: Attach APK to Latest Release
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        id: attach_asset
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.ACTION_TOKEN }}
+          script: |
+            const fs = require('fs');
+            
+            const artifactPath = process.env.GITHUB_WORKSPACE + '/build/app/outputs/flutter-apk/app-release.apk';
+            const fileSize = fs.statSync(artifactPath).size;
+            const artifactName = 'app-release.apk';
+            const releaseId = ${{ steps.get_latest_release.outputs.latest_release_id }};
+            const uploadUrl = await github.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: releaseId,
+              name: artifactName,
+              data: fs.readFileSync(artifactPath),
+              headers: {
+                'content-length': fileSize,
+                'content-type': 'application/octet-stream',
+              },
+            });
+            console.log(`Uploaded ${artifactName} to release ID ${releaseId}`);
+      
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
