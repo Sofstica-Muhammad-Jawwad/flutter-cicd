@@ -91,11 +91,12 @@ jobs:
 
       - name: Flutter Clean
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
+        run: flutter clean
+        
+      - name: Build Apk
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: flutter build apk --release
 
-      - name: Build APK
-        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
-        run: flutter clean
 
       - name: Upload APK
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
