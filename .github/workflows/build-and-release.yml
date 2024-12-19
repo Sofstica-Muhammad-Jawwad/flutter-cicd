@@ -97,7 +97,6 @@ jobs:
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: flutter build apk --release
 
-
       - name: Upload APK
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         id: upload_asset
@@ -141,38 +140,42 @@ jobs:
 
               let release;
    
-                // If no releases exist, create a new one
-                release = await github.repos.createRelease({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  tag_name: `${versionTag}`,  // Set your desired release tag here
-                  name: `${versionTag}`,  // Name of the release
-                  body: 'This is the release for version ${versionTag}.',
-                  draft: false,
-                  prerelease: false
-                });
-
-              // Upload the APK to the release
-              const uploadUrl = release.upload_url.replace("{?name,label}", "");
-
-              await github.repos.uploadReleaseAsset({
+              // If no releases exist, create a new one
+              release = await github.repos.createRelease({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                release_id: release.id,
-                name: artifactName,
-                data: fs.readFileSync(artifactPath),
-                headers: {
-                  'content-length': fileSize,
-                  'content-type': 'application/octet-stream',
-                },
+                tag_name: `${versionTag}`,  # Set your desired release tag here
+                name: `${versionTag}`,  # Name of the release
+                body: 'This is the release for version ${versionTag}.',
+                draft: false,
+                prerelease: false
               });
 
-              console.log(`Uploaded ${artifactName} to release ID ${release.id}`);
+              if (release.upload_url) {
+                // Upload the APK to the release
+                const uploadUrl = release.upload_url.replace("{?name,label}", "");
 
+                await github.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id,
+                  name: artifactName,
+                  data: fs.readFileSync(artifactPath),
+                  headers: {
+                    'content-length': fileSize,
+                    'content-type': 'application/octet-stream',
+                  },
+                });
+
+                console.log(`Uploaded ${artifactName} to release ID ${release.id}`);
+              } else {
+                throw new Error('No upload URL found for the release');
+              }
             } catch (error) {
               console.error('Error uploading release asset:', error);
               throw error;
             }
+
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
