@@ -122,6 +122,10 @@ jobs:
             const fileSize = fs.statSync(artifactPath).size;
             const artifactName = 'app-release.apk';
 
+            // Extract the version number from the branch name (e.g., "release/1.0.0")
+            const branchName = process.env.GITHUB_REF.split('/').pop();
+            const versionTag = `v${branchName}`;
+
             // Check if there are any releases
             try {
               const releases = await github.repos.listReleases({
@@ -139,7 +143,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   tag_name: 'v1.0.0',  // Set your desired release tag here
-                  name: 'Initial Release',  // Name of the release
+                  name: `${versionTag}`,  // Name of the release
                   body: 'This is the initial release of the app.',
                   draft: false,
                   prerelease: false
