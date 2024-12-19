@@ -83,12 +83,12 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Set up Flutter
+      - name: Set up Flutter (with compatible version)
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-        
+          flutter-version: '3.7.1'  # Update to a version that is compatible with Dart SDK >= 3.2.2
+
       - name: Build APK
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: flutter build apk --release
