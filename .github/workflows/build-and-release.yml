@@ -139,18 +139,28 @@ jobs:
               });
 
               let release;
-     
-              // If no releases exist, create a new one
-              release = await github.repos.createRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag_name: `${versionTag}`,  // Set your desired release tag here
-                name: `${versionTag}`,  // Name of the release
-                body: `This is the release for version ${versionTag}.`, // Body of the release
-                draft: false,
-                prerelease: false
-              });
 
+              if (releases.data.length === 0) {
+                // If no releases exist, create a new one
+                release = await github.repos.createRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag_name: versionTag,  // Set your desired release tag here
+                  name: versionTag,      // Name of the release
+                  body: `This is the release for version ${versionTag}.`,  // Body of the release
+                  draft: false,
+                  prerelease: false
+                });
+
+                // Log the release response to inspect the structure
+                console.log('Release created:', release);
+
+              } else {
+                // Use the most recent release
+                release = releases.data[0];
+              }
+
+              // Check if the release has an upload_url
               if (release.upload_url) {
                 // Upload the APK to the release
                 const uploadUrl = release.upload_url.replace("{?name,label}", "");
