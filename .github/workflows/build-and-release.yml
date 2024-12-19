@@ -92,7 +92,7 @@ jobs:
       - name: Flutter Clean
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: flutter clean
-        
+
       - name: Build Apk
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
         run: flutter build apk --release
@@ -125,11 +125,12 @@ jobs:
             const fs = require('fs');
             const artifactPath = process.env.GITHUB_WORKSPACE + '/build/app/outputs/flutter-apk/app-release.apk';
             const fileSize = fs.statSync(artifactPath).size;
-            const artifactName = 'app-release.apk';
 
             // Extract the version number from the branch name (e.g., "release/1.0.0")
             const branchName = process.env.GITHUB_REF.split('/').pop();
             const versionTag = `v${branchName}`;
+
+            const artifactName = `app-release-${versionTag}.apk`;
 
             // Check if there are any releases
             try {
@@ -149,7 +150,7 @@ jobs:
                   repo: context.repo.repo,
                   tag_name: 'v1.0.0',  // Set your desired release tag here
                   name: `${versionTag}`,  // Name of the release
-                  body: 'This is the initial release of the app.',
+                  body: 'This is the release for version ${versionTag}.',
                   draft: false,
                   prerelease: false
                 });
