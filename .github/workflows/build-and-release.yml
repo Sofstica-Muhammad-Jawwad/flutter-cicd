@@ -80,6 +80,42 @@ jobs:
             git push --set-upstream origin $NEW_BRANCH_NAME
           fi
 
+      - name: Build APK for Android
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for Android release branches
+        run: |
+          echo "🎉🎉🎉 Building APK 🎉🎉🎉"
+          # Install Flutter SDK if not already installed
+          git clone https://github.com/flutter/flutter.git --branch stable --single-branch --depth 1
+          export PATH="$PATH:`pwd`/flutter/bin"
+          
+          # Ensure Flutter is installed
+          flutter doctor -v
+
+          # Get dependencies
+          flutter pub get
+
+          # Build the APK (replace with the appropriate flavor if necessary)
+          flutter build apk --release
+
+          # Save the APK as an artifact for future steps
+          mv build/app/outputs/flutter-apk/app-release.apk $GITHUB_WORKSPACE/app-release.apk
+
+      - name: Create GitHub Release and Attach APK
+        if: ${{ env.is_rename_branch == 'true' }}  # Only run for Android release branches
+        run: |
+          echo "🎉🎉🎉 Creating GitHub Release 🎉🎉🎉"
+
+          # Get version name from the branch
+          VERSION_NAME=${GITHUB_REF#refs/heads/release/}
+          TAG_NAME="v$VERSION_NAME"  # Tag name should be like vX.X.X
+
+          # Create a release using GitHub CLI
+          gh release create $TAG_NAME $GITHUB_WORKSPACE/app-release.apk \
+            --title "Release $VERSION_NAME" \
+            --notes "### Changelog\n\n- Added new features.\n- Fixed bugs.\n\nRelease for version $VERSION_NAME" \
+            --target main  # Make sure to specify the target branch for the release
+
+
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: devmasx/merge-branch@master
