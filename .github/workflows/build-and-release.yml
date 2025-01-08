@@ -9,8 +9,9 @@ env:
   KEY_JKS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
 permissions:
-  contents: write  # Allow push to the repository
-  actions: read    # Allow reading action logs (optional)
+  contents: write   # Allow push to the repository
+  pull-requests: write  # Allow creating pull requests
+  actions: read     # Allow reading action logs (optional)
 
 jobs:
   build-and-releases:
