@@ -58,6 +58,8 @@ jobs:
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
 
+
+
             echo "NEW_BRANCH_NAME=$NEW_BRANCH_NAME" >> $GITHUB_ENV
 
             # Fetch all branches and create a new branch
@@ -74,6 +76,10 @@ jobs:
 
             echo "Set the upstream branch for the renamed branch"
             git push --set-upstream origin $NEW_BRANCH_NAME
+
+            # Add a 'v' prefix to the NEW_BRANCH_NAME (e.g., 'release/1.0.0' -> 'v1.0.0')
+            TAG_NAME="v${NEW_BRANCH_NAME#release/}"
+            echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           fi
 
       - name: Set up JDK 17
@@ -103,7 +109,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
-          tag: ${{ env.NEW_BRANCH_NAME }} 
+          tag: ${{ env.TAG_NAME }} 
           token: ${{ secrets.GITHUB_TOKEN }}
 
 
