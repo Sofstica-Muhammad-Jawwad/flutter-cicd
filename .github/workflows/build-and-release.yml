@@ -113,12 +113,12 @@ jobs:
           generate_release_notes: true  
           token: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Merge release/X.X.X -> main
+ - name: Create Pull Request from release branch to main
         if: ${{ env.is_rename_branch == 'true' }}
-        uses: devmasx/merge-branch@master
+        uses: peter-evans/create-pull-request@v4
         with:
-          type: now
-          from_branch: ${{ env.NEW_BRANCH_NAME }}  # Use the new branch name from the environment
-          target_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "${{ env.NEW_BRANCH_NAME }}"
+          head: ${{ env.NEW_BRANCH_NAME }}  # New branch (e.g., release/1.0.0)
+          base: main  # Target branch (main)
+          draft: false  # Set to `true` if you want the PR to be a draft, otherwise `false`
