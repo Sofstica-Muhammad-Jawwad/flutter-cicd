@@ -58,8 +58,6 @@ jobs:
             echo "Branch name before: $BRANCH_NAME"
             echo "Branch name after removing '$REMOVE_STRING': $NEW_BRANCH_NAME"
 
-
-
             echo "NEW_BRANCH_NAME=$NEW_BRANCH_NAME" >> $GITHUB_ENV
 
             # Fetch all branches and create a new branch
@@ -113,7 +111,7 @@ jobs:
           generate_release_notes: true  
           token: ${{ secrets.GITHUB_TOKEN }}
 
-       - name: Create Pull Request from release branch to main
+      - name: Create Pull Request from release branch to main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: peter-evans/create-pull-request@v4
         with:
