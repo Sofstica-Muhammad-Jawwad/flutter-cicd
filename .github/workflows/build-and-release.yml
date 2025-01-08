@@ -109,7 +109,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
-          tag: ${{ env.TAG_NAME }} 
+          tag: ${{ env.TAG_NAME }}
+          generate_release_notes: true  
           token: ${{ secrets.GITHUB_TOKEN }}
 
 
