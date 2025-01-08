@@ -113,7 +113,7 @@ jobs:
           generate_release_notes: true  
           token: ${{ secrets.GITHUB_TOKEN }}
 
- - name: Create Pull Request from release branch to main
+       - name: Create Pull Request from release branch to main
         if: ${{ env.is_rename_branch == 'true' }}
         uses: peter-evans/create-pull-request@v4
         with:
