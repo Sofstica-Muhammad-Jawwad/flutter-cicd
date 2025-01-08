@@ -104,7 +104,7 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: ${{ env.NEW_BRANCH_NAME }} 
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
 
       - name: Merge release/X.X.X -> main
