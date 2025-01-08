@@ -130,6 +130,10 @@ function incrementAndroidVersion() {
 }
 
 function createReleaseBranch() {
+    # Extract the version from pubspec.yaml (without the build number)
+    new_version_android=$(grep "version:" pubspec.yaml | awk -F ' ' '{print $2}' | cut -d '+' -f 1)
+    new_version_ios=$(grep "version:" pubspec.yaml | awk -F ' ' '{print $2}' | cut -d '+' -f 1)
+
     # Prompt user for release branch choice
     echo "Select a release type to create a branch:"
     echo "1. android-release"
