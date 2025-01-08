@@ -108,7 +108,7 @@ jobs:
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
           tag: ${{ env.TAG_NAME }}
-          generate_release_notes: true  
+          generateReleaseNotes: true  
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Pull Request from release branch to main
@@ -117,6 +117,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "${{ env.NEW_BRANCH_NAME }}"
-          head: ${{ env.NEW_BRANCH_NAME }}  # New branch (e.g., release/1.0.0)
           base: main  # Target branch (main)
           draft: false  # Set to `true` if you want the PR to be a draft, otherwise `false`
