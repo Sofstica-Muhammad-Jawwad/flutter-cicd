@@ -1,0 +1,4 @@
+#Wed Jan 08 07:36:21 UTC 2025
+base.0=/home/runner/work/flutter-cicd/flutter-cicd/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
