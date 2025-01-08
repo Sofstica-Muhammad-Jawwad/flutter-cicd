@@ -82,6 +82,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+          cache: "gradle"
 
       - name: Set up Flutter (with compatible version)
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
@@ -99,92 +100,12 @@ jobs:
 
       - name: Upload APK
         if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
-        id: upload_asset
-        uses: actions/upload-artifact@v3
+        uses: ncipollo/release-action@v1
         with:
-          name: app-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          tag: ${{ env.NEW_BRANCH_NAME }} 
+          token: ${{ secrets.TOKEN }}
 
-      - name: Set up Node.js
-        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        run: npm install @actions/github
-
-      - name: Attach APK to Latest Release
-        if: ${{ env.is_rename_branch == 'true' }}  # Only run for release branches
-        id: attach_asset
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}  # Ensure you are using the correct GitHub token
-          script: |
-            const fs = require('fs');
-            const artifactPath = process.env.GITHUB_WORKSPACE + '/build/app/outputs/flutter-apk/app-release.apk';
-            const fileSize = fs.statSync(artifactPath).size;
-
-            // Extract the version number from the branch name (e.g., "release/1.0.0")
-            const branchName = process.env.GITHUB_REF.split('/').pop();  // This should give you '1.0.49'
-            const versionTag = `v${branchName}`;  // This will result in 'v1.0.49'
-
-            const artifactName = `app-release-${versionTag}.apk`;
-
-            // Check if there are any releases
-            try {
-              const releases = await github.repos.listReleases({
-                owner: context.repo.owner,
-                repo: context.repo.repo
-              });
-
-              let release;
-
-              if (releases.data.length === 0) {
-                // If no releases exist, create a new one
-                release = await github.repos.createRelease({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  tag_name: versionTag,  // Set your desired release tag here
-                  name: versionTag,      // Name of the release
-                  body: `This is the release for version ${versionTag}.`,  // Body of the release
-                  draft: false,
-                  prerelease: false
-                });
-
-                // Log the release response to inspect the structure
-                console.log('Release created:', release);
-
-              } else {
-                // Use the most recent release
-                release = releases.data[0];
-              }
-
-              // Check if the release has an upload_url
-              if (release.upload_url) {
-                // Upload the APK to the release
-                const uploadUrl = release.upload_url.replace("{?name,label}", "");
-
-                await github.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: release.id,
-                  name: artifactName,
-                  data: fs.readFileSync(artifactPath),
-                  headers: {
-                    'content-length': fileSize,
-                    'content-type': 'application/octet-stream',
-                  },
-                });
-
-                console.log(`Uploaded ${artifactName} to release ID ${release.id}`);
-              } else {
-                throw new Error('No upload URL found for the release');
-              }
-            } catch (error) {
-              console.error('Error uploading release asset:', error);
-              throw error;
-            }
 
       - name: Merge release/X.X.X -> main
         if: ${{ env.is_rename_branch == 'true' }}
