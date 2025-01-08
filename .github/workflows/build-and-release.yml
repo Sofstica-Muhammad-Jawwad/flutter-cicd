@@ -117,5 +117,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "${{ env.NEW_BRANCH_NAME }}"
+          branch: ${{ env.NEW_BRANCH_NAME }}  
           base: main  # Target branch (main)
           draft: false  # Set to `true` if you want the PR to be a draft, otherwise `false`
